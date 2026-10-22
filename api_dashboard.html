@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Computational Physics Dashboard</title>
+    <link rel="stylesheet" href="style.css"> 
+</head>
+<body>
+
+    <h2>Computational Physics Dashboard</h2>
+    <a href="add_run.php" class="btn-add">+ Add New Run</a>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Run ID</th>
+                <th>Simulation Name</th>
+                <th>Researcher Name</th>
+                <th>Execution Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="table-body">
+            <tr><td colspan="6">Loading data from API...</td></tr>
+        </tbody>
+    </table>
+
+    <script>
+        function loadTableData() {
+            fetch('http://localhost:8000/api_get_runs.php')
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById('table-body');
+                    tableBody.innerHTML = ''; 
+
+                    data.forEach(run => {
+                        const row = document.createElement('tr');
+                        
+                        let statusClass = '';
+                        if (run.status === 'Completed') statusClass = 'status-completed';
+                        if (run.status === 'Running') statusClass = 'status-running';
+                        if (run.status === 'Failed') statusClass = 'status-failed';
+
+                        const selRunning = run.status === 'Running' ? 'selected' : '';
+                        const selCompleted = run.status === 'Completed' ? 'selected' : '';
+                        const selFailed = run.status === 'Failed' ? 'selected' : '';
+
+                        row.innerHTML = `
+                            <td>${run.run_id}</td>
+                            <td>${run.simulation_name}</td>
+                            <td>${run.researcher_name}</td>
+                            <td>${run.execution_date}</td>
+                            <td class="${statusClass}">${run.status}</td>
+                            <td>
+                                <select class="status-dropdown" onchange="updateStatus(${run.run_id}, this.value)">
+                                    <option value="Running" ${selRunning}>Running</option>
+                                    <option value="Completed" ${selCompleted}>Completed</option>
+                                    <option value="Failed" ${selFailed}>Failed</option>
+                                </select>
+                                <button class="btn-delete" onclick="deleteRun(${run.run_id})">Delete</button>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    document.getElementById('table-body').innerHTML = '<tr><td colspan="6" style="color:red;">Failed to load API data.</td></tr>';
+                });
+        }
+
+        function updateStatus(runId, newStatus) {
+            fetch('http://localhost:8000/api_update_run.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ run_id: runId, status: newStatus })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    loadTableData();
+                } else {
+                    alert('Error updating status: ' + data.error);
+                }
+            });
+        }
+
+        function deleteRun(runId) {
+            if(confirm('Are you sure you want to permanently delete this simulation run?')) {
+                fetch('http://localhost:8000/api_delete_run.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ run_id: runId })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.success) {
+                        loadTableData(); 
+                    } else {
+                        alert('Error deleting run: ' + data.error);
+                    }
+                });
+            }
+        }
+
+        loadTableData();
+    </script>
+</body>
+</html>

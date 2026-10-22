@@ -1,0 +1,54 @@
+/* style.css */
+body { 
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
+    padding: 20px; 
+    background: #f4f4f9; 
+}
+h2 { color: #333; }
+table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    background: white; 
+    margin-top: 15px; 
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+}
+th, td { 
+    padding: 12px; 
+    border: 1px solid #ddd; 
+    text-align: left; 
+}
+th { 
+    background-color: #007bff; 
+    color: white; 
+}
+.status-completed { color: green; font-weight: bold; }
+.status-running { color: orange; font-weight: bold; }
+.status-failed { color: red; font-weight: bold; }
+
+.btn-delete { 
+    background: #dc3545; 
+    color: white; 
+    border: none; 
+    padding: 6px 10px; 
+    border-radius: 4px; 
+    cursor: pointer; 
+    font-weight: bold;
+}
+.btn-delete:hover { background: #c82333; }
+.status-dropdown { 
+    padding: 5px; 
+    border-radius: 4px; 
+    border: 1px solid #ccc; 
+    margin-right: 8px;
+}
+.btn-add {
+    display: inline-block; 
+    margin-bottom: 15px; 
+    background: #007bff; 
+    color: white; 
+    padding: 10px 15px; 
+    text-decoration: none; 
+    border-radius: 4px;
+    font-weight: bold;
+}
+.btn-add:hover { background: #0056b3; }
